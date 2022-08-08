@@ -10,10 +10,25 @@ import Paper from "@mui/material/Paper";
 import ContactRow from "./ContactRow";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/AddCircleOutline";
+import UserForm from "./UserForm";
 
 export default function Contacts() {
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = React.useState(false);
+  const [newContact, setNewContact] = React.useState(false);
+  
+  const [contact, setContact] = useState({
+    id: 0,
+    type: 0,
+    value: '',
+    userId: 0,
+  })
+
+  const [user, setUser] = useState({
+    id: 0,
+    name: '',
+    contacts: []
+  })
 
   const apiUrl = "https://localhost:7117/api/";
 
@@ -22,7 +37,7 @@ export default function Contacts() {
       const result = await axios(apiUrl + "User");
       setUsers(result.data);
     })();
-  },[]);
+  }, []);
 
   const deleteUser = async (user) => {
     await axios.delete(apiUrl + "User/" + user.id);
@@ -53,38 +68,47 @@ export default function Contacts() {
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow>
-            <TableCell/>
-            <TableCell align="center">Usuário</TableCell>
-            <TableCell align="center">Telefone</TableCell>
-            <TableCell align="center">Email</TableCell>
-            <TableCell align="center">Whatapp</TableCell>
-            <TableCell align="center">Editar</TableCell>
-            <TableCell align="center">
-              <Button 
-              variant="text" 
-              color="primary" 
-              startIcon={<AddIcon />}
-              onClick={() => setNewUser(true)}>
-                Novo Usuário
-              </Button>
-            </TableCell>         
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {users.map((row) => (
-            <ContactRow
-              key={row.id}
-              value={row}
-              newUserButton={{newUser, setNewUser}}
-              methods={{ addOrEditContact, deleteUser, deleteContact }}
-            ></ContactRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableHead>
+            <TableRow>
+              <TableCell />
+              <TableCell align="center">Usuário</TableCell>
+              <TableCell align="center">Telefone</TableCell>
+              <TableCell align="center">Email</TableCell>
+              <TableCell align="center">Whatapp</TableCell>
+              <TableCell align="center">Editar</TableCell>
+              <TableCell align="center">
+                <Button
+                  variant="text"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  onClick={() => setNewUser(true)}
+                >
+                  Novo Usuário
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.map((row) => (
+              <ContactRow
+                key={row.id}
+                value={row}
+                newUserButton={{ newUser, setNewUser }}
+                user={{ user, setUser}}
+                methods={{ addOrEditContact, deleteUser, deleteContact }}
+              ></ContactRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <UserForm
+        open={{ open: newUser, setOpen: setNewUser }}
+        user={{ user, setUser }}
+        contact={{ contact, setContact }}
+      ></UserForm>
+    </>
   );
 }

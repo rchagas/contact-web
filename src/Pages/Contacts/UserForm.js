@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React  from "react";
 import {
   Box,
   Button,
@@ -33,9 +33,14 @@ export default function UserForm(props) {
 
   const onHandleContactChange = (e) => {
     contact[e.target.name] = e.target.value;
-    setContact(contact);
-    console.log(contact);
+    setContact({...contact});
   };
+
+  const addContact = () => {
+    setUser({...user, contacts: user.contacts.push(contact)})
+    console.log(user);
+    //setContact({...contact, value: '', type: 0});
+  }
 
   const saveButton = () => {
     handleClose();
@@ -59,11 +64,6 @@ export default function UserForm(props) {
         />
         <Box>
           <Table>
-            <TableHead>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Contato</TableCell>
-              <TableCell />
-            </TableHead>
             <TableBody>
               {user.contacts
                 .sort((a, b) => a.type - b.type)
@@ -83,7 +83,7 @@ export default function UserForm(props) {
                     label="Tipo"
                     type="number"
                     value={contact.type}
-                    onChange={onHandleChange}
+                    onChange={onHandleContactChange}
                     style={{ width: "150px" }}
                   >
                     {ContactType.map((option, index) => (
@@ -108,7 +108,7 @@ export default function UserForm(props) {
                   />
                 </TableCell>
                 <TableCell>
-                  <IconButton>
+                  <IconButton onClick={addContact}>
                     <AddIcon />
                   </IconButton>
                 </TableCell>

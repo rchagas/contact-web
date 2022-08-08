@@ -13,27 +13,22 @@ import ContactForm from "./ContactForm";
 import { Button, Collapse, Table, TableBody, TableHead } from "@mui/material";
 import Box from "@mui/system/Box";
 import CollapsibleTableRow from "./CollapsibleTableRow";
-import UserForm from "./UserForm";
 
 export default function ContactRow(props) {
   const { addOrEditContact, deleteUser, deleteContact } = props.methods;
   const row = props.value;
-  const {newUser, setNewUser} = props.newUserButton;
   
   const [open, setOpen] = React.useState(false);
   const [newContact, setNewContact] = React.useState(false);
+
+  const { user, setUser } = props.user;
+  const { newUser, setNewUser } = props.newUserButton;
   
   const [contact, setContact] = useState({
     id: 0,
     type: 0,
     value: '',
     userId: 0,
-  })
-
-  const [user, setUser] = useState({
-    id: 0,
-    name: '',
-    contacts: []
   })
   
   useEffect(() => {
@@ -54,6 +49,11 @@ export default function ContactRow(props) {
     }
     setContact(contact)
     setNewContact(true)
+  }
+
+  const editUserButton = (row) => {
+    setUser({...row})
+    setNewUser(true);
   }
 
   return (
@@ -84,7 +84,7 @@ export default function ContactRow(props) {
             ?.value || <HorizontalRuleIcon />}
         </TableCell>
         <TableCell align="center">
-          <IconButton onClick={() => {}}>
+          <IconButton onClick={() => editUserButton(row)}>
             <EditIcon />
           </IconButton>
         </TableCell>
@@ -134,11 +134,6 @@ export default function ContactRow(props) {
           </Collapse>
         </TableCell>
       </TableRow>
-      <UserForm
-        open={{open: newUser, setOpen: setNewUser}}
-        user={{user, setUser}}
-        contact={{ contact, setContact }}
-      ></UserForm>
       <ContactForm
         open={{ open: newContact, setOpen: setNewContact }}
         contact={{ contact, setContact }}

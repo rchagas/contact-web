@@ -8,14 +8,16 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 
 export default function ContactForm(props) {
-  const ContactType = ["Telefone", "Email", "Whatsapp"]
+  const ContactType = ['Telefone', 'Email', 'Whatsapp']
   const { contact, setContact } = props.contact;
   const { addOrEditContact } = props.methods;
   const { open, setOpen } = props.open;
 
   const onHandleChange = (e) => {
-    contact[e.target.name] = e.target.value;
-    setContact(contact);
+    if(e.target.name === 'type')
+      setContact({...contact, type: e.target.value});
+    else
+      setContact({...contact, value: e.target.value});
   };
 
   const handleClose = () => {
