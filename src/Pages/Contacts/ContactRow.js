@@ -62,7 +62,12 @@ export default function ContactRow(props) {
 
   const editUserButton = (row) => {
     contact.userId = row.id;
-    setContact({...contact, userId: row.id})
+    setContact({
+      id: 0,
+      type: 0,
+      value: "",
+      userId: row.id
+    })
     setUser({...row})
     setNewUser(true);
   }
