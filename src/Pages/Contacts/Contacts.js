@@ -2,93 +2,127 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import ContactRow from "./ContactRow";
-import { Button } from "@mui/material";
+import { Button, styled } from "@mui/material";
 import AddIcon from "@mui/icons-material/AddCircleOutline";
 import UserForm from "./UserForm";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
 export default function Contacts() {
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = React.useState(false);
-  const [newContact, setNewContact] = React.useState(false);
-  
+
   const [contact, setContact] = useState({
     id: 0,
     type: 0,
-    value: '',
+    value: "",
     userId: 0,
-  })
+  });
 
   const [user, setUser] = useState({
     id: 0,
-    name: '',
-    contacts: []
-  })
+    name: "",
+    contacts: [],
+  });
 
   const apiUrl = "https://localhost:7117/api/";
 
+  async function fetchData() {
+    const result = await axios(apiUrl + "User");
+    setUsers(result.data);
+  }
+
   useEffect(() => {
-    (async () => {
-      const result = await axios(apiUrl + "User");
-      setUsers(result.data);
-    })();
+    fetchData();
   }, []);
 
   const deleteUser = async (user) => {
     await axios.delete(apiUrl + "User/" + user.id);
-    setUsers(users.filter((val) => val.id !== user.id));
+    fetchData();
   };
 
   const deleteContact = async (contact) => {
     await axios.delete(apiUrl + "User/Contact/" + contact.id);
-    const user = users.find((obj) => obj.id === contact.userId);
-    user.contacts.splice(
-      user.contacts.findIndex((obj) => obj.id === contact.id),
-      1
-    );
-    setUsers(users);
+    fetchData();
   };
 
-  const addOrEditContact = async (contact) => {
-    console.log(contact);
-    const user = users.find((obj) => obj.id === contact.userId);
-    if (contact.id) {
-      const newContact = user.contacts.find((obj) => obj.id === contact.id);
-      newContact.type = contact.type;
-      newContact.value = contact.value;
+
+  const addOrEditContact = async () => {
+      const user = users.find((obj) => obj.id === contact.userId);
+      if (contact.id) {
+        const newContact = user.contacts.find((obj) => obj.id === contact.id);
+        newContact.type = contact.type;
+        newContact.value = contact.value;
+      } else {
+        user.contacts.push(contact);
+      }
+      await axios.put(apiUrl + "User", user);
+      fetchData();
+  };
+
+  const addOrEditUser = async () => {
+    if (user.id) {
+      await axios.put(apiUrl + "User", user);
     } else {
-      user.contacts.push(contact);
+      await axios.post(apiUrl + "User", user);
     }
-    await axios.put(apiUrl + "User", user);
+    fetchData();
+  };
+
+
+  const handleAddUserButton = () => {
+    setUser({
+      id: 0,
+      name: "",
+      contacts: [],
+    });
+
+    setContact({
+      id: 0,
+      type: 0,
+      value: "",
+      userId: 0,
+    });
+
+    setNewUser(true);
   };
 
   return (
     <>
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
-          <TableHead>
+          <TableHead sx={{fontWeight: '900'}}>
             <TableRow>
-              <TableCell />
-              <TableCell align="center">Usuário</TableCell>
-              <TableCell align="center">Telefone</TableCell>
-              <TableCell align="center">Email</TableCell>
-              <TableCell align="center">Whatapp</TableCell>
-              <TableCell align="center">Editar</TableCell>
-              <TableCell align="center">
+              <StyledTableCell />
+              <StyledTableCell align="center">Usuário</StyledTableCell>
+              <StyledTableCell align="center">Telefone</StyledTableCell>
+              <StyledTableCell align="center">Email</StyledTableCell>
+              <StyledTableCell align="center">Whatapp</StyledTableCell>
+              <StyledTableCell align="center">Editar</StyledTableCell>
+              <StyledTableCell align="center">
                 <Button
                   variant="text"
-                  color="primary"
                   startIcon={<AddIcon />}
-                  onClick={() => setNewUser(true)}
+                  onClick={handleAddUserButton}
+                  sx={{color: 'white'}}
                 >
                   Novo Usuário
                 </Button>
-              </TableCell>
+              </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -97,7 +131,8 @@ export default function Contacts() {
                 key={row.id}
                 value={row}
                 newUserButton={{ newUser, setNewUser }}
-                user={{ user, setUser}}
+                user={{ user, setUser }}
+                contact={{ contact, setContact }}
                 methods={{ addOrEditContact, deleteUser, deleteContact }}
               ></ContactRow>
             ))}
@@ -108,6 +143,7 @@ export default function Contacts() {
         open={{ open: newUser, setOpen: setNewUser }}
         user={{ user, setUser }}
         contact={{ contact, setContact }}
+        methods={{ addOrEditUser }}
       ></UserForm>
     </>
   );

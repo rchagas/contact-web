@@ -1,4 +1,4 @@
-import React  from "react";
+import React from "react";
 import {
   Box,
   Button,
@@ -8,7 +8,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableRow,
   TextField,
 } from "@mui/material";
@@ -22,6 +21,7 @@ export default function UserForm(props) {
   const { user, setUser } = props.user;
   const { open, setOpen } = props.open;
   const { contact, setContact } = props.contact;
+  const { addOrEditUser } = props.methods;
 
   const handleClose = () => {
     setOpen(false);
@@ -32,17 +32,21 @@ export default function UserForm(props) {
   };
 
   const onHandleContactChange = (e) => {
-    contact[e.target.name] = e.target.value;
-    setContact({...contact});
+    if (e.target.name === "type")
+      setContact({ ...contact, type: e.target.value, userId: user.id });
+    else setContact({ ...contact, value: e.target.value, userId: user.id });
   };
 
   const addContact = () => {
-    setUser({...user, contacts: user.contacts.push(contact)})
-    console.log(user);
-    //setContact({...contact, value: '', type: 0});
-  }
+    const updatedContacts = [...user.contacts, contact];
+    console.log(contact);
+    console.log(updatedContacts);
+    setUser({ ...user, contacts: updatedContacts });
+    setContact({ id: 0, value: "", type: 0, userId: user.id });
+  };
 
   const saveButton = () => {
+    addOrEditUser();
     handleClose();
   };
 
@@ -54,7 +58,7 @@ export default function UserForm(props) {
           autoFocus
           margin="dense"
           id="name"
-          name="value"
+          name="name"
           label="Contato"
           type="text"
           fullWidth
@@ -65,14 +69,16 @@ export default function UserForm(props) {
         <Box>
           <Table>
             <TableBody>
-              {user.contacts
-                .sort((a, b) => a.type - b.type)
-                .map((row) => (
-                  <TableRow>
-                    <TableCell>{ContactType[row.type]}</TableCell>
-                    <TableCell colSpan={2}>{row.value}</TableCell>
-                  </TableRow>
-                ))}
+              {Array.isArray(user.contacts)
+                ? user.contacts
+                    .sort((a, b) => a.type - b.type)
+                    .map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{ContactType[row.type]}</TableCell>
+                        <TableCell colSpan={2}>{row.value}</TableCell>
+                      </TableRow>
+                    ))
+                : []}
               <TableRow>
                 <TableCell>
                   <TextField
@@ -103,7 +109,7 @@ export default function UserForm(props) {
                     type="text"
                     fullWidth
                     variant="standard"
-                    defaultValue={contact.value}
+                    value={contact.value}
                     onChange={onHandleContactChange}
                   />
                 </TableCell>

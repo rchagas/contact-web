@@ -25,7 +25,7 @@ export default function ContactForm(props) {
   };
 
   const saveButton = () => {
-    addOrEditContact(contact);
+    addOrEditContact();
     handleClose();
   };
 
@@ -61,7 +61,7 @@ export default function ContactForm(props) {
           type="text"
           fullWidth
           variant="standard"
-          defaultValue={contact.value}
+          value={contact.value}
           onChange={onHandleChange}
         />
       </DialogContent>
