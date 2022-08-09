@@ -17,7 +17,8 @@ Para executar o projeto deve-se instalar suas dependências com o comando\
 Após instaladas as dependências, inicie o programa em modo de desenvolvimento com o comando\
 `npm start` ou `yarn start`.  
 
-O programa vai estar executando na porta `http://localhost:3000` padrão do react, para alterar a porta padrão modifique o arquivo `package.json`.
+O programa vai estar executando na porta `http://localhost:3000` padrão do react.\
+Para alterar a porta padrão modifique o arquivo `package.json`, a porta que será utilizada deve ser liberada para requisições na Api.
 
 ## Funcionamento do Projeto
 
